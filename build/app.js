@@ -48,7 +48,7 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _index = __webpack_require__(39);
+	var _index = __webpack_require__(1);
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
@@ -59,10 +59,10 @@
 	var HelloWorld = function (_Component) {
 	    _inherits(HelloWorld, _Component);
 	
-	    function HelloWorld() {
+	    function HelloWorld(props) {
 	        _classCallCheck(this, HelloWorld);
 	
-	        var _this = _possibleConstructorReturn(this, (HelloWorld.__proto__ || Object.getPrototypeOf(HelloWorld)).call(this));
+	        var _this = _possibleConstructorReturn(this, (HelloWorld.__proto__ || Object.getPrototypeOf(HelloWorld)).call(this, props));
 	
 	        _this.state = {
 	            wellcome: 'hello'
@@ -71,11 +71,16 @@
 	            _this.setState({
 	                wellcome: _this.state.wellcome + ' hello'
 	            });
-	        }, 3000);
+	        }, 5000);
 	        return _this;
 	    }
 	
 	    _createClass(HelloWorld, [{
+	        key: 'componentDidMount',
+	        value: function componentDidMount() {
+	            console.log('HelloWorld did mount');
+	        }
+	    }, {
 	        key: 'render',
 	        value: function render(h) {
 	            return h('div.hello', {
@@ -87,8 +92,49 @@
 	    return HelloWorld;
 	}(_index.Component);
 	
-	var App = function (_Component2) {
-	    _inherits(App, _Component2);
+	/**
+	 * list component
+	 */
+	
+	
+	var ListComponent = function (_Component2) {
+	    _inherits(ListComponent, _Component2);
+	
+	    function ListComponent(initialState) {
+	        _classCallCheck(this, ListComponent);
+	
+	        return _possibleConstructorReturn(this, (ListComponent.__proto__ || Object.getPrototypeOf(ListComponent)).call(this, initialState));
+	    }
+	
+	    _createClass(ListComponent, [{
+	        key: 'renderList',
+	        value: function renderList(h) {
+	            var count = 1000,
+	                _list = [];
+	
+	            while (count--) {
+	                _list.push(h('li.list-group-item', {
+	                    key: count
+	                }, ['ListComponentInstance ' + this.state.name, h('span.badge', [count])]));
+	            }
+	
+	            return _list;
+	        }
+	    }, {
+	        key: 'render',
+	        value: function render(h) {
+	            return h('ul.list-group', [this.renderList(h)]);
+	        }
+	    }]);
+	
+	    return ListComponent;
+	}(_index.Component);
+	
+	var HelloWorldComponent = new HelloWorld();
+	var ListComponentInstance = new ListComponent();
+	
+	var App = function (_Component3) {
+	    _inherits(App, _Component3);
 	
 	    function App() {
 	        _classCallCheck(this, App);
@@ -97,16 +143,35 @@
 	    }
 	
 	    _createClass(App, [{
+	        key: 'componentDidMount',
+	        value: function componentDidMount() {
+	            console.log('App did mount');
+	        }
+	    }, {
+	        key: 'renderList',
+	        value: function renderList(h) {
+	            var count = 100,
+	                _list = [];
+	
+	            while (count--) {
+	                _list.push(h(HelloWorldComponent, {
+	                    message: 'good job'
+	                }));
+	            }
+	
+	            return _list;
+	        }
+	    }, {
 	        key: 'render',
 	        value: function render(h) {
-	            return h('div.wrapper', [h('div.main', ['hello world', h(HelloWorld)])]);
+	            return h('div.wrapper', [h('div.main', [h(ListComponentInstance)])]);
 	        }
 	    }]);
 	
 	    return App;
 	}(_index.Component);
 	
-	(0, _index.renderDOM)(App, '#app');
+	(0, _index.renderDOM)(new App(), '#app');
 
 /***/ },
 /* 1 */
@@ -117,125 +182,68 @@
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	
-	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	exports.Component = exports.renderDOM = undefined;
 	
 	var _vDom = __webpack_require__(2);
 	
-	var _utils = __webpack_require__(38);
+	var _Component = __webpack_require__(38);
 	
-	var _config = __webpack_require__(40);
-	
-	var _config2 = _interopRequireDefault(_config);
+	var _Component2 = _interopRequireDefault(_Component);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	function renderDOM(AppComponent, selector) {
+	    var app = {
+	        isRendering: false,
+	        vTree: Object.create(null),
+	        rootNode: Object.create(null),
+	        rootComponent: null,
+	        update: function update(cb) {
+	            var _this = this;
 	
-	var uid = 0;
-	
-	var Component = function () {
-	    function Component(props) {
-	        var _this = this;
-	
-	        _classCallCheck(this, Component);
-	
-	        this.renderHelper = function () {
-	            for (var _len = arguments.length, rest = Array(_len), _key = 0; _key < _len; _key++) {
-	                rest[_key] = arguments[_key];
-	            }
-	
-	            if (isComponent(rest[0])) {
-	                var child = new rest[0](),
-	                    vTree = child.renderDOM();
-	                _this.$children[child.$id] = child;
-	
-	                return (0, _vDom.h)("div", { id: child.$id }, [vTree]);
+	            console.log('to update times');
+	            if (this.isRendering) {
+	                return;
 	            } else {
-	                return _vDom.h.apply(null, rest);
+	                this.isRendering = true;
+	                defer(function () {
+	                    var patches = (0, _vDom.diff)(_this.vTree, _this.rootComponent.$vTree);
+	                    _this.rootNode = (0, _vDom.patch)(_this.rootNode, patches);
+	
+	                    if (cb != null) {
+	                        cb();
+	                    }
+	                    _this.isRendering = false;
+	                    console.log('had update times');
+	                });
 	            }
-	        };
-	
-	        this.$vTree = null;
-	        this.$oldTree = null;
-	        this.$id = uid++;
-	        this.$parent = null;
-	        this.$el = null;
-	        this.$vNode = null;
-	        this.$children = {};
-	
-	        this.state = {};
-	
-	        this.renderDOM();
-	    }
-	    /**
-	     * is-component
-	     */
-	
-	
-	    _createClass(Component, [{
-	        key: 'render',
-	        value: function render(h) {
-	            return h('div');
 	        }
-	    }, {
-	        key: 'setState',
-	        value: function setState(state, cb) {
-	            var newState = _extends({}, this.state, state);
-	            this.state = newState;
+	    };
 	
-	            cb && cb.call(this, newState);
-	            this._update();
+	    var rootComponent = app.rootComponent = AppComponent._initApp(app),
+	        $vTree = rootComponent.$vTree;
 	
-	            return newState;
-	        }
-	    }, {
-	        key: 'getState',
-	        value: function getState() {
-	            return this.state;
-	        }
-	    }, {
-	        key: 'renderDOM',
-	        value: function renderDOM() {
-	            this.$oldTree = this.$vTree;
-	            this.$vTree = this.render(this.renderHelper);
+	    app.rootComponent._initApp(app);
+	    app.rootNode = (0, _vDom.create)($vTree);
+	    app.vTree = $vTree;
 	
-	            return this.$vTree;
-	        }
-	    }, {
-	        key: '_update',
-	        value: function _update() {
-	            this.renderDOM();
+	    document.querySelector(selector).appendChild(app.rootNode);
+	}
 	
-	            this.$el = document.getElementById(this.$id);
-	            var patches = (0, _vDom.diff)(this.$oldTree, this.$vTree);
-	            var node = (0, _vDom.create)(this.$Tree);
-	            (0, _vDom.patch)(this.$el, patches);
-	        }
-	    }]);
-	
-	    return Component;
-	}();
+	exports.renderDOM = renderDOM;
+	exports.Component = _Component2.default;
 	
 	/**
-	 * helper function
+	 * defer
 	 */
 	
+	function defer() {
+	    var cb = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : function () {};
+	    var Timer = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
 	
-	Component.__component__ = true;
-	exports.default = Component;
-	function isComponent(component) {
-	    if (typeof component === 'function') {
-	        var _isComponent = false;
-	        if (component.__component__) {
-	            _isComponent = true;
-	        }
-	        return _isComponent;
-	    } else {
-	        return false;
-	    }
+	    setTimeout(function () {
+	        cb();
+	    }, Timer);
 	}
 
 /***/ },
@@ -2064,6 +2072,227 @@
 
 /***/ },
 /* 38 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+	
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _vDom = __webpack_require__(2);
+	
+	var _utils = __webpack_require__(39);
+	
+	var _config = __webpack_require__(40);
+	
+	var _config2 = _interopRequireDefault(_config);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var uid = 0;
+	
+	var Component = function () {
+	    function Component(initialState) {
+	        var _this = this;
+	
+	        _classCallCheck(this, Component);
+	
+	        this._renderHelper = function () {
+	            for (var _len = arguments.length, rest = Array(_len), _key = 0; _key < _len; _key++) {
+	                rest[_key] = arguments[_key];
+	            }
+	
+	            if (isComponent(rest[0])) {
+	                var _ret = function () {
+	                    var child = rest[0];
+	                    if (child.$parent && child.$parent._hasId(child.$id)) {
+	                        _this._receiveNewProps(rest[1]);
+	                    } else {
+	                        /**
+	                         * render child component
+	                         * receive two params, componentName and props
+	                         */
+	                        if (isComponent(_this)) {
+	                            setTimeout(function () {
+	                                child._appendTo(_this);
+	                            }, 0);
+	                        }
+	                    }
+	
+	                    child.initProps(rest[1]);
+	                    return {
+	                        v: child.renderDOM()
+	                    };
+	                }();
+	
+	                if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+	            } else {
+	                return _vDom.h.apply(null, rest);
+	            }
+	        };
+	
+	        this.$vTree = null;
+	        this.$oldTree = null;
+	        this.$id = uid++;
+	        this.$parent = null;
+	        this.$el = null;
+	        this.$children = [];
+	        this.props = null;
+	        this.state = initialState || {};
+	
+	        this._isMounted = false;
+	
+	        /**
+	         * private data
+	         */
+	        this._componentCache = Object.create(null);
+	
+	        this.renderDOM();
+	    }
+	
+	    _createClass(Component, [{
+	        key: 'initProps',
+	        value: function initProps(props) {
+	            this.props = props;
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'render',
+	        value: function render(h) {
+	            return h('div');
+	        }
+	    }, {
+	        key: 'setState',
+	        value: function setState(state, cb) {
+	            var newState = _extends({}, this.state, state);
+	            this.state = newState;
+	
+	            cb && cb.call(this, newState);
+	            this._update();
+	
+	            return newState;
+	        }
+	    }, {
+	        key: 'getState',
+	        value: function getState() {
+	            return this.state;
+	        }
+	    }, {
+	        key: 'renderDOM',
+	        value: function renderDOM() {
+	            this.$oldTree = this.$vTree;
+	            this.$vTree = this.render(this._renderHelper);
+	
+	            return this.$vTree;
+	        }
+	    }, {
+	        key: '_initApp',
+	        value: function _initApp(app) {
+	            this.$app = app || this.$app;
+	
+	            return this;
+	        }
+	
+	        /**
+	         * life cycle hook
+	         */
+	
+	    }, {
+	        key: '_receiveNewProps',
+	        value: function _receiveNewProps(nextProps) {
+	            this.componentWillReceiveProps && this.componentWillReceiveProps(nextProps);
+	
+	            this._update();
+	        }
+	    }, {
+	        key: '_didMount',
+	        value: function _didMount() {
+	            this.componentDidMount && this.componentDidMount();
+	        }
+	
+	        /**
+	         * component constructor
+	         */
+	
+	    }, {
+	        key: '_hasId',
+	        value: function _hasId(id) {
+	            return id != null && this._componentCache[id] ? true : false;
+	        }
+	
+	        /**
+	         * components helper methods
+	         */
+	
+	    }, {
+	        key: '_appendTo',
+	        value: function _appendTo(parent) {
+	            parent.$children.push(this);
+	            parent._componentCache[this.$id] = true;
+	            this.$parent = parent;
+	
+	            if (!this.$app) {
+	                this.$app = parent.$app;
+	            }
+	            this._vDomUpdate();
+	        }
+	    }, {
+	        key: '_update',
+	        value: function _update() {
+	            this.renderDOM();
+	            this._vDomUpdate();
+	        }
+	    }, {
+	        key: '_vDomUpdate',
+	        value: function _vDomUpdate() {
+	            var _this2 = this;
+	
+	            if (!this.$parent && !this.$app) {
+	                console.warn(this.constructor.name + ' component was not mounted.');
+	
+	                return;
+	            }
+	            this.$app.update(function () {
+	                /**
+	                 * excute first time
+	                 */
+	                if (!_this2._isMounted) {
+	                    _this2._didMount();
+	                    _this2._isMounted = true;
+	                }
+	            });
+	        }
+	    }]);
+	
+	    return Component;
+	}();
+	
+	/**
+	 * helper function
+	 */
+	
+	
+	exports.default = Component;
+	function isComponent(component) {
+	    if (component instanceof Component) {
+	        return true;
+	    } else {
+	        return false;
+	    }
+	}
+
+/***/ },
+/* 39 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -2085,33 +2314,6 @@
 	function randomStr() {
 	    return Math.random() + String(Number(new Date()));
 	}
-
-/***/ },
-/* 39 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	exports.Component = exports.renderDOM = undefined;
-	
-	var _vDom = __webpack_require__(2);
-	
-	var _Component = __webpack_require__(1);
-	
-	var _Component2 = _interopRequireDefault(_Component);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function renderDOM(AppComponent, selector) {
-	    var instanceApp = new AppComponent();
-	    var rootNode = (0, _vDom.create)((0, _vDom.h)('div', { id: instanceApp.$id }, [instanceApp.$vTree]));
-	    document.querySelector(selector).appendChild(rootNode);
-	}
-	exports.renderDOM = renderDOM;
-	exports.Component = _Component2.default;
 
 /***/ },
 /* 40 */
